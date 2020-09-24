@@ -1,18 +1,17 @@
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class CalculatorOOP {
-    double a;
-    double b;
-    String operator;
-    static boolean checker = true;
-    Scanner scanner = new Scanner(System.in);
+public class Calculator {
+    private double a;
+    private double b;
+    private String operator;
+    private Scanner scanner = new Scanner(System.in);
 
     void setA(double a) {
         this.a = a;
     }
 
-    void setB(double b){
+    void setB(double b) {
         this.b = b;
     }
 
@@ -23,7 +22,7 @@ public class CalculatorOOP {
                 return Double.parseDouble(scanner.next());
                 //break;
             } catch (NumberFormatException e) {
-                System.out.println("Chybný vstup");
+                System.out.println("Chybný vstup. Zadej desetinné číslo.");
             }
         }
 
@@ -36,12 +35,12 @@ public class CalculatorOOP {
     String scanOperator() {
         while (true) {
             try {
-                System.out.println("Zadej operátor: ");
+                System.out.println("Zadej operátor (+, -, *, /): ");
                 operator = scanner.next();
                 if (operator.equals("+") || operator.equals("-") || operator.equals("*") || operator.equals("/")) {
                     return operator;
                 } else {
-                    System.out.println("Operátor musí být: +, -, * nebo /.");
+                    System.out.println("Operátor musí být: +, -, * nebo / .");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Chybný vstup");
@@ -49,64 +48,67 @@ public class CalculatorOOP {
         }
     }
 
-    double count() {
+    double compute() {
+        Operation operation = null;
         switch (operator) {
             case "+":
-                return a + b;
+                operation = new Addition();
+                break;
             case "-":
-                return a - b;
+                operation = new Subtraction();
+                break;
             case "*":
-                return a * b;
+                operation = new Multiplication();
+                break;
             case "/":
-                try {
-                    return a / b;
-                } catch (ArithmeticException e) {
-                    System.out.println("Nulou dělit nelze! Je nutno zadat jinou hodnotu b nebo jiný operátor.");
-                    break;
-                }
+                operation = new Division();
+                break;
             default:
-                System.out.println("Chybný vstup");
                 break;
         }
-        return 0;
+        if (!(operation == null)) {
+            return operation.calculate(a, b);
+        } else {
+            System.out.println("\n!!! Neznámý operátor !!! \n");
+            return -1;
+        }
     }
 
     void printResult(double result) {
         System.out.printf("Výsledek: %.2f.  ", result);
     }
 
-    void decideIfContinue() {
+    boolean decideIfContinue() {
         System.out.println("Chceš pokračovat ?  ANO / NE ");
-        String goOn = scanner.next();
-
-        if (goOn.toUpperCase().equals("NE")) {
-            checker = false;
-        }
+        return !scanner.next().toUpperCase().equals("NE");
     }
 
     public static void main(String[] args) {
+
+        boolean userWantsContinue = true;
+
 //      print introduction
-        System.out.println("Program Kalkulačka");
         System.out.println();
-        System.out.println("Provádí operace s celými čísly (sčítání, odčítání, násobení, dělení");
+        System.out.println("Program Kalkulačka");
+        System.out.println("Provádí operace s desetinnými čísly (sčítání, odčítání, násobení, dělení)");
+        System.out.println("-------------------------------------------------------------------------");
+        System.out.println();
 
 //      make object
-        CalculatorOOP calculator = new CalculatorOOP();
+        Calculator calculator = new Calculator();
 
-        while (checker) {
+        while (userWantsContinue) {
 
-//          get variables
+//          get variables and operator
             calculator.setA(calculator.scan("a"));
             calculator.setB(calculator.scan("b"));
             calculator.setOperator(calculator.scanOperator());
 
 //          perform operation and print result
-            calculator.printResult(calculator.count());
-
+            calculator.printResult(calculator.compute());
 
 //          decide if continue
-            calculator.decideIfContinue();
-
+            userWantsContinue = calculator.decideIfContinue();
         }
     }
 }
